@@ -1,745 +1,1399 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="th">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IT Support Logger</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #0d0f14;
-    --surface: #13161e;
-    --surface2: #1a1e28;
-    --border: #252a38;
-    --border2: #2e3548;
-    --accent: #4f8ef7;
-    --accent2: #6aa3ff;
-    --green: #3ecf8e;
-    --amber: #f5a623;
-    --red: #f06565;
-    --text: #e8eaf0;
-    --text2: #8b92a8;
-    --text3: #555e78;
-    --mono: 'IBM Plex Mono', monospace;
-    --sans: 'IBM Plex Sans Thai', sans-serif;
-    --radius: 10px;
-  }
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { font-size: 15px; }
-  body {
-    font-family: var(--sans);
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    line-height: 1.6;
-  }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>IT Support Logger</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0d0f14;
+        --surface: #13161e;
+        --surface2: #1a1e28;
+        --border: #252a38;
+        --border2: #2e3548;
+        --accent: #4f8ef7;
+        --accent2: #6aa3ff;
+        --green: #3ecf8e;
+        --amber: #f5a623;
+        --red: #f06565;
+        --text: #e8eaf0;
+        --text2: #8b92a8;
+        --text3: #555e78;
+        --mono: "IBM Plex Mono", monospace;
+        --sans: "IBM Plex Sans Thai", sans-serif;
+        --radius: 10px;
+      }
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        font-size: 15px;
+      }
+      body {
+        font-family: var(--sans);
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        line-height: 1.6;
+      }
 
-  /* Layout */
-  .app { display: flex; flex-direction: column; min-height: 100vh; max-width: 960px; margin: 0 auto; padding: 0 1.25rem; }
+      /* Layout */
+      .app {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 0 1.25rem;
+      }
 
-  /* Header */
-  .header {
-    padding: 1.5rem 0 1rem;
-    border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
-  }
-  .logo { display: flex; align-items: center; gap: 10px; }
-  .logo-icon {
-    width: 36px; height: 36px; background: var(--accent);
-    border-radius: 8px; display: flex; align-items: center; justify-content: center;
-    font-size: 18px;
-  }
-  .logo-text { font-size: 1rem; font-weight: 600; letter-spacing: -0.02em; }
-  .logo-sub { font-size: 0.75rem; color: var(--text3); font-family: var(--mono); }
-  .sync-status {
-    display: flex; align-items: center; gap: 7px;
-    font-size: 0.75rem; color: var(--text3); font-family: var(--mono);
-  }
-  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text3); }
-  .dot.connected { background: var(--green); box-shadow: 0 0 6px var(--green); animation: pulse 2s infinite; }
-  .dot.error { background: var(--red); }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+      /* Header */
+      .header {
+        padding: 1.5rem 0 1rem;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+      }
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .logo-icon {
+        width: 36px;
+        height: 36px;
+        background: var(--accent);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+      }
+      .logo-icon img {
+        width: 42px;
+        height: 42px;
+        object-fit: cover;
+        border-radius: 50%;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+        transition: 0.2s;
+      }
 
-  /* Nav */
-  .nav { display: flex; gap: 4px; padding: 1rem 0 0; }
-  .nav-btn {
-    padding: 7px 18px; border-radius: 20px; font-size: 0.82rem;
-    font-family: var(--sans); cursor: pointer; border: 1px solid transparent;
-    color: var(--text3); background: transparent; transition: all 0.15s;
-  }
-  .nav-btn:hover { color: var(--text2); }
-  .nav-btn.active { background: var(--surface2); border-color: var(--border2); color: var(--text); font-weight: 500; }
+      .logo-icon img:hover {
+        transform: scale(1.05);
+      }
+      .logo-text {
+        font-size: 1rem;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+      }
+      .logo-sub {
+        font-size: 0.75rem;
+        color: var(--text3);
+        font-family: var(--mono);
+      }
+      .sync-status {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 0.75rem;
+        color: var(--text3);
+        font-family: var(--mono);
+      }
+      .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--text3);
+      }
+      .dot.connected {
+        background: var(--green);
+        box-shadow: 0 0 6px var(--green);
+        animation: pulse 2s infinite;
+      }
+      .dot.error {
+        background: var(--red);
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
 
-  /* Views */
-  .view { display: none; padding: 1.5rem 0 3rem; }
-  .view.active { display: block; }
+      /* Nav */
+      .nav {
+        display: flex;
+        gap: 4px;
+        padding: 1rem 0 0;
+      }
+      .nav-btn {
+        padding: 7px 18px;
+        border-radius: 20px;
+        font-size: 0.82rem;
+        font-family: var(--sans);
+        cursor: pointer;
+        border: 1px solid transparent;
+        color: var(--text3);
+        background: transparent;
+        transition: all 0.15s;
+      }
+      .nav-btn:hover {
+        color: var(--text2);
+      }
+      .nav-btn.active {
+        background: var(--surface2);
+        border-color: var(--border2);
+        color: var(--text);
+        font-weight: 500;
+      }
 
-  /* Config banner */
-  .config-banner {
-    background: linear-gradient(135deg, #1a1e2e, #1e2438);
-    border: 1px solid var(--accent);
-    border-radius: var(--radius); padding: 1.25rem 1.5rem;
-    margin-bottom: 1.5rem;
-  }
-  .config-banner h3 { font-size: 0.9rem; font-weight: 600; color: var(--accent2); margin-bottom: 0.5rem; }
-  .config-banner p { font-size: 0.82rem; color: var(--text2); margin-bottom: 0.75rem; }
-  .url-row { display: flex; gap: 8px; }
-  .url-input {
-    flex: 1; background: var(--bg); border: 1px solid var(--border2);
-    border-radius: 8px; padding: 9px 12px; font-size: 0.82rem;
-    font-family: var(--mono); color: var(--text);
-  }
-  .url-input:focus { outline: none; border-color: var(--accent); }
-  .btn-save-url {
-    background: var(--accent); color: white; border: none;
-    border-radius: 8px; padding: 9px 18px; font-size: 0.82rem;
-    font-family: var(--sans); cursor: pointer; font-weight: 500; white-space: nowrap;
-  }
-  .btn-save-url:hover { background: var(--accent2); }
+      /* Views */
+      .view {
+        display: none;
+        padding: 1.5rem 0 3rem;
+      }
+      .view.active {
+        display: block;
+      }
 
-  /* Card */
-  .card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius); padding: 1.25rem 1.5rem; margin-bottom: 1rem;
-  }
-  .card-title { font-size: 0.72rem; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 1rem; }
+      /* Config banner */
+      .config-banner {
+        background: linear-gradient(135deg, #1a1e2e, #1e2438);
+        border: 1px solid var(--accent);
+        border-radius: var(--radius);
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+      .config-banner h3 {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--accent2);
+        margin-bottom: 0.5rem;
+      }
+      .config-banner p {
+        font-size: 0.82rem;
+        color: var(--text2);
+        margin-bottom: 0.75rem;
+      }
+      .url-row {
+        display: flex;
+        gap: 8px;
+      }
+      .url-input {
+        flex: 1;
+        background: var(--bg);
+        border: 1px solid var(--border2);
+        border-radius: 8px;
+        padding: 9px 12px;
+        font-size: 0.82rem;
+        font-family: var(--mono);
+        color: var(--text);
+      }
+      .url-input:focus {
+        outline: none;
+        border-color: var(--accent);
+      }
+      .btn-save-url {
+        background: var(--accent);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 9px 18px;
+        font-size: 0.82rem;
+        font-family: var(--sans);
+        cursor: pointer;
+        font-weight: 500;
+        white-space: nowrap;
+      }
+      .btn-save-url:hover {
+        background: var(--accent2);
+      }
 
-  /* Form */
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .form-group { display: flex; flex-direction: column; gap: 5px; }
-  .form-group.full { grid-column: 1 / -1; }
-  label { font-size: 0.78rem; color: var(--text3); }
-  input, select, textarea {
-    background: var(--bg); border: 1px solid var(--border2);
-    border-radius: 8px; padding: 9px 12px; font-size: 0.88rem;
-    font-family: var(--sans); color: var(--text); transition: border-color 0.15s;
-  }
-  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); }
-  select option { background: var(--surface2); }
-  textarea { resize: vertical; min-height: 72px; line-height: 1.5; }
+      /* Card */
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1.25rem 1.5rem;
+        margin-bottom: 1rem;
+      }
+      .card-title {
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: var(--text3);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 1rem;
+      }
 
-  /* Buttons */
-  .btn-row { display: flex; gap: 8px; margin-top: 1rem; }
-  .btn {
-    padding: 9px 20px; border-radius: 8px; font-size: 0.85rem;
-    font-family: var(--sans); cursor: pointer; border: 1px solid var(--border2);
-    background: transparent; color: var(--text2); transition: all 0.15s;
-  }
-  .btn:hover { background: var(--surface2); color: var(--text); }
-  .btn.primary { background: var(--accent); color: white; border-color: transparent; font-weight: 500; }
-  .btn.primary:hover { background: var(--accent2); }
-  .btn.danger { border-color: var(--red); color: var(--red); }
-  .btn.danger:hover { background: rgba(240,101,101,0.1); }
-  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+      /* Form */
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+      .form-group.full {
+        grid-column: 1 / -1;
+      }
+      label {
+        font-size: 0.78rem;
+        color: var(--text3);
+      }
+      input,
+      select,
+      textarea {
+        background: var(--bg);
+        border: 1px solid var(--border2);
+        border-radius: 8px;
+        padding: 9px 12px;
+        font-size: 0.88rem;
+        font-family: var(--sans);
+        color: var(--text);
+        transition: border-color 0.15s;
+      }
+      input:focus,
+      select:focus,
+      textarea:focus {
+        outline: none;
+        border-color: var(--accent);
+      }
+      select option {
+        background: var(--surface2);
+      }
+      textarea {
+        resize: vertical;
+        min-height: 72px;
+        line-height: 1.5;
+      }
 
-  /* Toast */
-  .toast {
-    position: fixed; bottom: 1.5rem; right: 1.5rem;
-    background: var(--surface2); border: 1px solid var(--border2);
-    border-radius: var(--radius); padding: 12px 18px;
-    font-size: 0.85rem; color: var(--text);
-    transform: translateY(80px); opacity: 0;
-    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-    z-index: 100; max-width: 320px;
-  }
-  .toast.show { transform: translateY(0); opacity: 1; }
-  .toast.success { border-color: var(--green); color: var(--green); }
-  .toast.error { border-color: var(--red); color: var(--red); }
+      /* Buttons */
+      .btn-row {
+        display: flex;
+        gap: 8px;
+        margin-top: 1rem;
+      }
+      .btn {
+        padding: 9px 20px;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-family: var(--sans);
+        cursor: pointer;
+        border: 1px solid var(--border2);
+        background: transparent;
+        color: var(--text2);
+        transition: all 0.15s;
+      }
+      .btn:hover {
+        background: var(--surface2);
+        color: var(--text);
+      }
+      .btn.primary {
+        background: var(--accent);
+        color: white;
+        border-color: transparent;
+        font-weight: 500;
+      }
+      .btn.primary:hover {
+        background: var(--accent2);
+      }
+      .btn.danger {
+        border-color: var(--red);
+        color: var(--red);
+      }
+      .btn.danger:hover {
+        background: rgba(240, 101, 101, 0.1);
+      }
+      .btn:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
 
-  /* Metrics */
-  .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.25rem; }
-  .metric { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.1rem; }
-  .metric-label { font-size: 0.72rem; color: var(--text3); margin-bottom: 5px; font-family: var(--mono); }
-  .metric-value { font-size: 1.6rem; font-weight: 600; color: var(--text); font-family: var(--mono); }
-  .metric-value.accent { color: var(--accent); }
-  .metric-value.green { color: var(--green); }
+      /* Toast */
+      .toast {
+        position: fixed;
+        bottom: 1.5rem;
+        right: 1.5rem;
+        background: var(--surface2);
+        border: 1px solid var(--border2);
+        border-radius: var(--radius);
+        padding: 12px 18px;
+        font-size: 0.85rem;
+        color: var(--text);
+        transform: translateY(80px);
+        opacity: 0;
+        transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        z-index: 100;
+        max-width: 320px;
+      }
+      .toast.show {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      .toast.success {
+        border-color: var(--green);
+        color: var(--green);
+      }
+      .toast.error {
+        border-color: var(--red);
+        color: var(--red);
+      }
 
-  /* Table */
-  .table-wrap { overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
-  th { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border2); color: var(--text3); font-weight: 500; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
-  td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--text2); vertical-align: middle; }
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: var(--surface2); }
+      /* Metrics */
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        margin-bottom: 1.25rem;
+      }
+      .metric {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1rem 1.1rem;
+      }
+      .metric-label {
+        font-size: 0.72rem;
+        color: var(--text3);
+        margin-bottom: 5px;
+        font-family: var(--mono);
+      }
+      .metric-value {
+        font-size: 1.6rem;
+        font-weight: 600;
+        color: var(--text);
+        font-family: var(--mono);
+      }
+      .metric-value.accent {
+        color: var(--accent);
+      }
+      .metric-value.green {
+        color: var(--green);
+      }
 
-  /* Tags */
-  .tag { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 500; white-space: nowrap; }
-  .tag-done { background: rgba(62,207,142,0.12); color: var(--green); }
-  .tag-pending { background: rgba(79,142,247,0.12); color: var(--accent2); }
-  .tag-open { background: rgba(245,166,35,0.12); color: var(--amber); }
+      /* Table */
+      .table-wrap {
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.83rem;
+      }
+      th {
+        text-align: left;
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--border2);
+        color: var(--text3);
+        font-weight: 500;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        white-space: nowrap;
+      }
+      td {
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--border);
+        color: var(--text2);
+        vertical-align: middle;
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      tr:hover td {
+        background: var(--surface2);
+      }
 
-  /* Filters */
-  .filters { display: flex; gap: 8px; margin-bottom: 1rem; align-items: center; }
-  .filters select { padding: 7px 10px; font-size: 0.8rem; }
-  .filters-right { margin-left: auto; }
+      /* Tags */
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 0.72rem;
+        font-weight: 500;
+        white-space: nowrap;
+      }
+      .tag-done {
+        background: rgba(62, 207, 142, 0.12);
+        color: var(--green);
+      }
+      .tag-pending {
+        background: rgba(79, 142, 247, 0.12);
+        color: var(--accent2);
+      }
+      .tag-open {
+        background: rgba(245, 166, 35, 0.12);
+        color: var(--amber);
+      }
 
-  /* Empty */
-  .empty { text-align: center; padding: 3rem; color: var(--text3); font-size: 0.88rem; }
-  .empty-icon { font-size: 2.5rem; margin-bottom: 0.75rem; opacity: 0.4; }
+      /* Filters */
+      .filters {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 1rem;
+        align-items: center;
+      }
+      .filters select {
+        padding: 7px 10px;
+        font-size: 0.8rem;
+      }
+      .filters-right {
+        margin-left: auto;
+      }
 
-  /* Report sections */
-  .report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
-  .type-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 0.85rem; }
-  .type-row:last-child { border-bottom: none; }
-  .type-bar-bg { flex: 1; height: 5px; background: var(--border2); border-radius: 3px; overflow: hidden; }
-  .type-bar { height: 100%; background: var(--accent); border-radius: 3px; transition: width 0.5s ease; }
-  .type-name { width: 120px; color: var(--text2); font-size: 0.82rem; }
-  .type-count { font-family: var(--mono); font-size: 0.8rem; color: var(--text3); width: 30px; text-align: right; }
+      /* Empty */
+      .empty {
+        text-align: center;
+        padding: 3rem;
+        color: var(--text3);
+        font-size: 0.88rem;
+      }
+      .empty-icon {
+        font-size: 2.5rem;
+        margin-bottom: 0.75rem;
+        opacity: 0.4;
+      }
 
-  /* Loading */
-  .loading { display: inline-flex; gap: 4px; align-items: center; }
-  .loading span { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); animation: bounce 0.8s infinite; }
-  .loading span:nth-child(2) { animation-delay: 0.15s; }
-  .loading span:nth-child(3) { animation-delay: 0.3s; }
-  @keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-6px)} }
+      /* Report sections */
+      .report-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 1rem;
+      }
+      .type-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--border);
+        font-size: 0.85rem;
+      }
+      .type-row:last-child {
+        border-bottom: none;
+      }
+      .type-bar-bg {
+        flex: 1;
+        height: 5px;
+        background: var(--border2);
+        border-radius: 3px;
+        overflow: hidden;
+      }
+      .type-bar {
+        height: 100%;
+        background: var(--accent);
+        border-radius: 3px;
+        transition: width 0.5s ease;
+      }
+      .type-name {
+        width: 120px;
+        color: var(--text2);
+        font-size: 0.82rem;
+      }
+      .type-count {
+        font-family: var(--mono);
+        font-size: 0.8rem;
+        color: var(--text3);
+        width: 30px;
+        text-align: right;
+      }
 
-  /* Delete btn */
-  .del-btn { background: none; border: none; color: var(--text3); cursor: pointer; padding: 4px 8px; border-radius: 6px; font-size: 0.78rem; }
-  .del-btn:hover { color: var(--red); background: rgba(240,101,101,0.1); }
+      /* Loading */
+      .loading {
+        display: inline-flex;
+        gap: 4px;
+        align-items: center;
+      }
+      .loading span {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: var(--accent);
+        animation: bounce 0.8s infinite;
+      }
+      .loading span:nth-child(2) {
+        animation-delay: 0.15s;
+      }
+      .loading span:nth-child(3) {
+        animation-delay: 0.3s;
+      }
+      @keyframes bounce {
+        0%,
+        80%,
+        100% {
+          transform: translateY(0);
+        }
+        40% {
+          transform: translateY(-6px);
+        }
+      }
 
-  /* Date range */
-  .date-range { display: flex; gap: 8px; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; }
-  .date-range input { padding: 7px 10px; font-size: 0.8rem; }
-  .date-range label { font-size: 0.8rem; color: var(--text3); }
+      /* Delete btn */
+      .del-btn {
+        background: none;
+        border: none;
+        color: var(--text3);
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 0.78rem;
+      }
+      .del-btn:hover {
+        color: var(--red);
+        background: rgba(240, 101, 101, 0.1);
+      }
 
-  @media (max-width: 640px) {
-    .metrics { grid-template-columns: repeat(2, 1fr); }
-    .form-grid { grid-template-columns: 1fr; }
-    .form-group.full { grid-column: 1; }
-    .report-grid { grid-template-columns: 1fr; }
-  }
-</style>
-</head>
-<body>
-<div class="app">
-  <header class="header">
-    <div class="logo">
-      <div class="logo-icon">🖥</div>
-      <div>
-        <div class="logo-text">IT Support Logger</div>
-        <div class="logo-sub">work log · sync via Google Sheets</div>
-      </div>
-    </div>
-    <div class="sync-status">
-      <div class="dot" id="sync-dot"></div>
-      <span id="sync-label">ไม่ได้เชื่อมต่อ</span>
-    </div>
-  </header>
+      /* Date range */
+      .date-range {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 1.25rem;
+        flex-wrap: wrap;
+      }
+      .date-range input {
+        padding: 7px 10px;
+        font-size: 0.8rem;
+      }
+      .date-range label {
+        font-size: 0.8rem;
+        color: var(--text3);
+      }
 
-  <nav class="nav">
-    <button class="nav-btn active" onclick="switchTab('log')">บันทึกงาน</button>
-    <button class="nav-btn" onclick="switchTab('history')">ประวัติ</button>
-    <button class="nav-btn" onclick="switchTab('report')">รีพอร์ต</button>
-    <button class="nav-btn" onclick="switchTab('settings')">ตั้งค่า</button>
-  </nav>
-
-  <!-- LOG -->
-  <div id="tab-log" class="view active">
-    <div class="card" id="config-banner-log" style="display:none; background: linear-gradient(135deg,#1a1e2e,#1e2438); border-color: var(--accent);">
-      <div class="card-title" style="color:var(--accent2);">⚙ ยังไม่ได้ตั้งค่า Apps Script URL</div>
-      <p style="font-size:0.83rem;color:var(--text2);margin-bottom:0.75rem;">ข้อมูลจะเซฟเฉพาะเครื่องนี้จนกว่าจะตั้งค่า — ไปที่ <strong>ตั้งค่า</strong> เพื่อเชื่อม Google Sheets</p>
-    </div>
-    <div class="card">
-      <div class="card-title">บันทึก case ใหม่</div>
-      <div class="form-grid">
-        <div class="form-group">
-          <label>วันที่</label>
-          <input type="date" id="inp-date">
+      @media (max-width: 640px) {
+        .metrics {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
+        .form-group.full {
+          grid-column: 1;
+        }
+        .report-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <header class="header">
+        <div class="logo">
+          <div class="logo-icon">
+            <img src="me.jpg" alt="my profile" />
+          </div>
+          <div>
+            <div class="logo-text">IT Support Logger</div>
+            <div class="logo-sub">work log · sync via Google Sheets</div>
+          </div>
         </div>
-        <div class="form-group">
-          <label>ช่องทางรับงาน</label>
-          <select id="inp-channel">
-            <option value="Ticket">Ticket</option>
-            <option value="โทรศัพท์">โทรศัพท์</option>
-            <option value="แชท">แชท</option>
-            <option value="Walk-in">Walk-in</option>
-            <option value="On-site">On-site</option>
+        <div class="sync-status">
+          <div class="dot" id="sync-dot"></div>
+          <span id="sync-label">ไม่ได้เชื่อมต่อ</span>
+        </div>
+      </header>
+
+      <nav class="nav">
+        <button class="nav-btn active" onclick="switchTab('log')">
+          บันทึกงาน
+        </button>
+        <button class="nav-btn" onclick="switchTab('history')">ประวัติ</button>
+        <button class="nav-btn" onclick="switchTab('report')">รีพอร์ต</button>
+        <button class="nav-btn" onclick="switchTab('settings')">ตั้งค่า</button>
+      </nav>
+
+      <!-- LOG -->
+      <div id="tab-log" class="view active">
+        <div
+          class="card"
+          id="config-banner-log"
+          style="
+            display: none;
+            background: linear-gradient(135deg, #1a1e2e, #1e2438);
+            border-color: var(--accent);
+          "
+        >
+          <div class="card-title" style="color: var(--accent2)">
+            ⚙ ยังไม่ได้ตั้งค่า Apps Script URL
+          </div>
+          <p
+            style="
+              font-size: 0.83rem;
+              color: var(--text2);
+              margin-bottom: 0.75rem;
+            "
+          >
+            ข้อมูลจะเซฟเฉพาะเครื่องนี้จนกว่าจะตั้งค่า — ไปที่
+            <strong>ตั้งค่า</strong> เพื่อเชื่อม Google Sheets
+          </p>
+        </div>
+        <div class="card">
+          <div class="card-title">บันทึก case ใหม่</div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>วันที่</label>
+              <input type="date" id="inp-date" />
+            </div>
+            <div class="form-group">
+              <label>ช่องทางรับงาน</label>
+              <select id="inp-channel">
+                <option value="Ticket">Ticket</option>
+                <option value="โทรศัพท์">โทรศัพท์</option>
+                <option value="แชท">แชท</option>
+                <option value="Walk-in">Walk-in</option>
+                <option value="On-site">On-site</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>ผู้แจ้ง / หน่วยงาน</label>
+              <input
+                type="text"
+                id="inp-requester"
+                placeholder="เช่น คุณสมชาย / ฝ่ายบัญชี"
+              />
+            </div>
+            <div class="form-group">
+              <label>ประเภทปัญหา</label>
+              <select id="inp-type">
+                <option value="Hardware">Hardware</option>
+                <option value="Software">Software</option>
+                <option value="Network">Network</option>
+                <option value="Account/Access">Account / Access</option>
+                <option value="Email">Email</option>
+                <option value="Printer">Printer</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="form-group full">
+              <label>รายละเอียดปัญหาและสิ่งที่ทำ</label>
+              <textarea
+                id="inp-detail"
+                placeholder="อธิบายอาการและวิธีแก้ไข..."
+              ></textarea>
+            </div>
+            <div class="form-group">
+              <label>เวลาที่ใช้ (นาที)</label>
+              <input type="number" id="inp-time" placeholder="30" min="1" />
+            </div>
+            <div class="form-group">
+              <label>สถานะ</label>
+              <select id="inp-status">
+                <option value="เสร็จแล้ว">เสร็จแล้ว</option>
+                <option value="กำลังดำเนินการ">กำลังดำเนินการ</option>
+                <option value="รอดำเนินการ">รอดำเนินการ</option>
+              </select>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn primary" id="btn-save" onclick="saveEntry()">
+              บันทึก case
+            </button>
+            <button class="btn" onclick="clearForm()">ล้างฟอร์ม</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- HISTORY -->
+      <div id="tab-history" class="view">
+        <div class="filters">
+          <select
+            id="f-type"
+            onchange="renderHistory()"
+            style="padding: 7px 10px; font-size: 0.8rem"
+          >
+            <option value="">ทุกประเภท</option>
+            <option>Hardware</option>
+            <option>Software</option>
+            <option>Network</option>
+            <option>Account/Access</option>
+            <option>Email</option>
+            <option>Printer</option>
+            <option>Other</option>
           </select>
-        </div>
-        <div class="form-group">
-          <label>ผู้แจ้ง / หน่วยงาน</label>
-          <input type="text" id="inp-requester" placeholder="เช่น คุณสมชาย / ฝ่ายบัญชี">
-        </div>
-        <div class="form-group">
-          <label>ประเภทปัญหา</label>
-          <select id="inp-type">
-            <option value="Hardware">Hardware</option>
-            <option value="Software">Software</option>
-            <option value="Network">Network</option>
-            <option value="Account/Access">Account / Access</option>
-            <option value="Email">Email</option>
-            <option value="Printer">Printer</option>
-            <option value="Other">Other</option>
+          <select
+            id="f-status"
+            onchange="renderHistory()"
+            style="padding: 7px 10px; font-size: 0.8rem"
+          >
+            <option value="">ทุกสถานะ</option>
+            <option>เสร็จแล้ว</option>
+            <option>กำลังดำเนินการ</option>
+            <option>รอดำเนินการ</option>
           </select>
-        </div>
-        <div class="form-group full">
-          <label>รายละเอียดปัญหาและสิ่งที่ทำ</label>
-          <textarea id="inp-detail" placeholder="อธิบายอาการและวิธีแก้ไข..."></textarea>
-        </div>
-        <div class="form-group">
-          <label>เวลาที่ใช้ (นาที)</label>
-          <input type="number" id="inp-time" placeholder="30" min="1">
-        </div>
-        <div class="form-group">
-          <label>สถานะ</label>
-          <select id="inp-status">
-            <option value="เสร็จแล้ว">เสร็จแล้ว</option>
-            <option value="กำลังดำเนินการ">กำลังดำเนินการ</option>
-            <option value="รอดำเนินการ">รอดำเนินการ</option>
-          </select>
-        </div>
-      </div>
-      <div class="btn-row">
-        <button class="btn primary" id="btn-save" onclick="saveEntry()">บันทึก case</button>
-        <button class="btn" onclick="clearForm()">ล้างฟอร์ม</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- HISTORY -->
-  <div id="tab-history" class="view">
-    <div class="filters">
-      <select id="f-type" onchange="renderHistory()" style="padding:7px 10px;font-size:0.8rem;">
-        <option value="">ทุกประเภท</option>
-        <option>Hardware</option><option>Software</option><option>Network</option>
-        <option>Account/Access</option><option>Email</option><option>Printer</option><option>Other</option>
-      </select>
-      <select id="f-status" onchange="renderHistory()" style="padding:7px 10px;font-size:0.8rem;">
-        <option value="">ทุกสถานะ</option>
-        <option>เสร็จแล้ว</option><option>กำลังดำเนินการ</option><option>รอดำเนินการ</option>
-      </select>
-      <div class="filters-right">
-        <button class="btn danger" style="padding:7px 14px;font-size:0.78rem;" onclick="clearAll()">ลบทั้งหมด</button>
-      </div>
-    </div>
-    <div class="card" style="padding:0;">
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>วันที่</th>
-              <th>ผู้แจ้ง</th>
-              <th>ประเภท</th>
-              <th>ช่องทาง</th>
-              <th>รายละเอียด</th>
-              <th>นาที</th>
-              <th>สถานะ</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="history-body"></tbody>
-        </table>
-        <div id="history-empty" class="empty" style="display:none;">
-          <div class="empty-icon">📋</div>
-          ยังไม่มีข้อมูล
-        </div>
-        <div id="history-loading" class="empty">
-          <div class="loading"><span></span><span></span><span></span></div>
-          <div style="margin-top:8px;font-size:0.8rem;">กำลังโหลด...</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- REPORT -->
-  <div id="tab-report" class="view">
-    <div class="date-range">
-      <label>จาก</label>
-      <input type="date" id="rpt-from">
-      <label>ถึง</label>
-      <input type="date" id="rpt-to">
-      <button class="btn" style="padding:7px 16px;font-size:0.82rem;" onclick="renderReport()">ดูรีพอร์ต</button>
-    </div>
-
-    <div class="metrics">
-      <div class="metric">
-        <div class="metric-label">TOTAL CASES</div>
-        <div class="metric-value accent" id="m-total">—</div>
-      </div>
-      <div class="metric">
-        <div class="metric-label">RESOLVED</div>
-        <div class="metric-value green" id="m-done">—</div>
-      </div>
-      <div class="metric">
-        <div class="metric-label">TOTAL HRS</div>
-        <div class="metric-value" id="m-hrs">—</div>
-      </div>
-      <div class="metric">
-        <div class="metric-label">AVG MIN/CASE</div>
-        <div class="metric-value" id="m-avg">—</div>
-      </div>
-    </div>
-
-    <div class="report-grid">
-      <div class="card">
-        <div class="card-title">ประเภทปัญหา</div>
-        <div id="type-chart"></div>
-      </div>
-      <div class="card">
-        <div class="card-title">ช่องทางรับงาน</div>
-        <div id="channel-chart"></div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">งานรายวัน (7 วันล่าสุด)</div>
-      <div id="daily-chart" style="display:flex;align-items:flex-end;gap:8px;height:120px;padding-top:8px;"></div>
-      <div id="daily-labels" style="display:flex;gap:8px;margin-top:6px;"></div>
-    </div>
-  </div>
-
-  <!-- SETTINGS -->
-  <div id="tab-settings" class="view">
-    <div class="card" style="background: linear-gradient(135deg,#1a1e2e,#1e2438); border-color: var(--accent);">
-      <div class="card-title" style="color:var(--accent2);">เชื่อมต่อ Google Sheets</div>
-      <p style="font-size:0.83rem;color:var(--text2);margin-bottom:1rem;line-height:1.7;">
-        วาง URL ของ Google Apps Script Web App ที่นี่ ข้อมูลทุก case จะ sync ไปเก็บใน Google Sheet ของคุณอัตโนมัติ
-      </p>
-      <div class="url-row">
-        <input class="url-input" type="text" id="script-url" placeholder="https://script.google.com/macros/s/.../exec">
-        <button class="btn-save-url" onclick="saveUrl()">บันทึก</button>
-      </div>
-      <div id="url-status" style="font-size:0.78rem;margin-top:8px;color:var(--text3);font-family:var(--mono);"></div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">วิธีตั้งค่า Apps Script (ทำครั้งเดียว)</div>
-      <div style="font-size:0.85rem;color:var(--text2);line-height:2;">
-        <div style="counter-reset:steps;">
-          <div style="display:flex;gap:10px;margin-bottom:8px;">
-            <span style="color:var(--accent);font-family:var(--mono);font-weight:600;min-width:24px;">1.</span>
-            <span>เปิด <a href="https://sheets.new" target="_blank" style="color:var(--accent2);">sheets.new</a> สร้าง Google Sheet ใหม่</span>
+          <div class="filters-right">
+            <button
+              class="btn danger"
+              style="padding: 7px 14px; font-size: 0.78rem"
+              onclick="clearAll()"
+            >
+              ลบทั้งหมด
+            </button>
           </div>
-          <div style="display:flex;gap:10px;margin-bottom:8px;">
-            <span style="color:var(--accent);font-family:var(--mono);font-weight:600;min-width:24px;">2.</span>
-            <span>ไปที่ Extensions → Apps Script</span>
-          </div>
-          <div style="display:flex;gap:10px;margin-bottom:8px;">
-            <span style="color:var(--accent);font-family:var(--mono);font-weight:600;min-width:24px;">3.</span>
-            <span>ลบโค้ดเก่าออก แล้ว copy โค้ดจากไฟล์ <span style="font-family:var(--mono);color:var(--accent);">Code.gs</span> วางลงไป</span>
-          </div>
-          <div style="display:flex;gap:10px;margin-bottom:8px;">
-            <span style="color:var(--accent);font-family:var(--mono);font-weight:600;min-width:24px;">4.</span>
-            <span>กด Deploy → New deployment → Web App</span>
-          </div>
-          <div style="display:flex;gap:10px;margin-bottom:8px;">
-            <span style="color:var(--accent);font-family:var(--mono);font-weight:600;min-width:24px;">5.</span>
-            <span>ตั้ง "Who has access" เป็น <strong style="color:var(--text);">Anyone</strong> → Deploy</span>
-          </div>
-          <div style="display:flex;gap:10px;">
-            <span style="color:var(--accent);font-family:var(--mono);font-weight:600;min-width:24px;">6.</span>
-            <span>Copy URL ที่ได้ มาวางในช่องด้านบน</span>
+        </div>
+        <div class="card" style="padding: 0">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>วันที่</th>
+                  <th>ผู้แจ้ง</th>
+                  <th>ประเภท</th>
+                  <th>ช่องทาง</th>
+                  <th>รายละเอียด</th>
+                  <th>นาที</th>
+                  <th>สถานะ</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="history-body"></tbody>
+            </table>
+            <div id="history-empty" class="empty" style="display: none">
+              <div class="empty-icon">📋</div>
+              ยังไม่มีข้อมูล
+            </div>
+            <div id="history-loading" class="empty">
+              <div class="loading"><span></span><span></span><span></span></div>
+              <div style="margin-top: 8px; font-size: 0.8rem">กำลังโหลด...</div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="card">
-      <div class="card-title">ข้อมูลแอป</div>
-      <div style="font-size:0.83rem;color:var(--text2);display:flex;flex-direction:column;gap:8px;">
-        <div style="display:flex;justify-content:space-between;">
-          <span>จำนวน case ทั้งหมด</span>
-          <span style="font-family:var(--mono);color:var(--text);" id="info-count">—</span>
+      <!-- REPORT -->
+      <div id="tab-report" class="view">
+        <div class="date-range">
+          <label>จาก</label>
+          <input type="date" id="rpt-from" />
+          <label>ถึง</label>
+          <input type="date" id="rpt-to" />
+          <button
+            class="btn"
+            style="padding: 7px 16px; font-size: 0.82rem"
+            onclick="renderReport()"
+          >
+            ดูรีพอร์ต
+          </button>
         </div>
-        <div style="display:flex;justify-content:space-between;">
-          <span>การเชื่อมต่อ</span>
-          <span style="font-family:var(--mono);" id="info-conn">ไม่ได้เชื่อมต่อ</span>
+
+        <div class="metrics">
+          <div class="metric">
+            <div class="metric-label">TOTAL CASES</div>
+            <div class="metric-value accent" id="m-total">—</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">RESOLVED</div>
+            <div class="metric-value green" id="m-done">—</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">TOTAL HRS</div>
+            <div class="metric-value" id="m-hrs">—</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">AVG MIN/CASE</div>
+            <div class="metric-value" id="m-avg">—</div>
+          </div>
+        </div>
+
+        <div class="report-grid">
+          <div class="card">
+            <div class="card-title">ประเภทปัญหา</div>
+            <div id="type-chart"></div>
+          </div>
+          <div class="card">
+            <div class="card-title">ช่องทางรับงาน</div>
+            <div id="channel-chart"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">งานรายวัน (7 วันล่าสุด)</div>
+          <div
+            id="daily-chart"
+            style="
+              display: flex;
+              align-items: flex-end;
+              gap: 8px;
+              height: 120px;
+              padding-top: 8px;
+            "
+          ></div>
+          <div
+            id="daily-labels"
+            style="display: flex; gap: 8px; margin-top: 6px"
+          ></div>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div id="tab-settings" class="view">
+        <div
+          class="card"
+          style="
+            background: linear-gradient(135deg, #1a1e2e, #1e2438);
+            border-color: var(--accent);
+          "
+        >
+          <div class="card-title" style="color: var(--accent2)">
+            เชื่อมต่อ Google Sheets
+          </div>
+          <p
+            style="
+              font-size: 0.83rem;
+              color: var(--text2);
+              margin-bottom: 1rem;
+              line-height: 1.7;
+            "
+          >
+            วาง URL ของ Google Apps Script Web App ที่นี่ ข้อมูลทุก case จะ sync
+            ไปเก็บใน Google Sheet ของคุณอัตโนมัติ
+          </p>
+          <div class="url-row">
+            <input
+              class="url-input"
+              type="text"
+              id="script-url"
+              placeholder="https://script.google.com/macros/s/.../exec"
+            />
+            <button class="btn-save-url" onclick="saveUrl()">บันทึก</button>
+          </div>
+          <div
+            id="url-status"
+            style="
+              font-size: 0.78rem;
+              margin-top: 8px;
+              color: var(--text3);
+              font-family: var(--mono);
+            "
+          ></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">วิธีตั้งค่า Apps Script (ทำครั้งเดียว)</div>
+          <div style="font-size: 0.85rem; color: var(--text2); line-height: 2">
+            <div style="counter-reset: steps">
+              <div style="display: flex; gap: 10px; margin-bottom: 8px">
+                <span
+                  style="
+                    color: var(--accent);
+                    font-family: var(--mono);
+                    font-weight: 600;
+                    min-width: 24px;
+                  "
+                  >1.</span
+                >
+                <span
+                  >เปิด
+                  <a
+                    href="https://sheets.new"
+                    target="_blank"
+                    style="color: var(--accent2)"
+                    >sheets.new</a
+                  >
+                  สร้าง Google Sheet ใหม่</span
+                >
+              </div>
+              <div style="display: flex; gap: 10px; margin-bottom: 8px">
+                <span
+                  style="
+                    color: var(--accent);
+                    font-family: var(--mono);
+                    font-weight: 600;
+                    min-width: 24px;
+                  "
+                  >2.</span
+                >
+                <span>ไปที่ Extensions → Apps Script</span>
+              </div>
+              <div style="display: flex; gap: 10px; margin-bottom: 8px">
+                <span
+                  style="
+                    color: var(--accent);
+                    font-family: var(--mono);
+                    font-weight: 600;
+                    min-width: 24px;
+                  "
+                  >3.</span
+                >
+                <span
+                  >ลบโค้ดเก่าออก แล้ว copy โค้ดจากไฟล์
+                  <span style="font-family: var(--mono); color: var(--accent)"
+                    >Code.gs</span
+                  >
+                  วางลงไป</span
+                >
+              </div>
+              <div style="display: flex; gap: 10px; margin-bottom: 8px">
+                <span
+                  style="
+                    color: var(--accent);
+                    font-family: var(--mono);
+                    font-weight: 600;
+                    min-width: 24px;
+                  "
+                  >4.</span
+                >
+                <span>กด Deploy → New deployment → Web App</span>
+              </div>
+              <div style="display: flex; gap: 10px; margin-bottom: 8px">
+                <span
+                  style="
+                    color: var(--accent);
+                    font-family: var(--mono);
+                    font-weight: 600;
+                    min-width: 24px;
+                  "
+                  >5.</span
+                >
+                <span
+                  >ตั้ง "Who has access" เป็น
+                  <strong style="color: var(--text)">Anyone</strong> →
+                  Deploy</span
+                >
+              </div>
+              <div style="display: flex; gap: 10px">
+                <span
+                  style="
+                    color: var(--accent);
+                    font-family: var(--mono);
+                    font-weight: 600;
+                    min-width: 24px;
+                  "
+                  >6.</span
+                >
+                <span>Copy URL ที่ได้ มาวางในช่องด้านบน</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">ข้อมูลแอป</div>
+          <div
+            style="
+              font-size: 0.83rem;
+              color: var(--text2);
+              display: flex;
+              flex-direction: column;
+              gap: 8px;
+            "
+          >
+            <div style="display: flex; justify-content: space-between">
+              <span>จำนวน case ทั้งหมด</span>
+              <span
+                style="font-family: var(--mono); color: var(--text)"
+                id="info-count"
+                >—</span
+              >
+            </div>
+            <div style="display: flex; justify-content: space-between">
+              <span>การเชื่อมต่อ</span>
+              <span style="font-family: var(--mono)" id="info-conn"
+                >ไม่ได้เชื่อมต่อ</span
+              >
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</div>
 
-<div class="toast" id="toast"></div>
+    <div class="toast" id="toast"></div>
 
-<script>
-// ---- State ----
-let entries = [];
-let scriptUrl = localStorage.getItem('it_script_url') || '';
-let isConnected = false;
+    <script>
+      // ---- State ----
+      let entries = [];
+      let scriptUrl = localStorage.getItem("it_script_url") || "";
+      let isConnected = false;
 
-// ---- Init ----
-document.getElementById('inp-date').value = new Date().toISOString().slice(0,10);
-if (scriptUrl) {
-  document.getElementById('script-url').value = scriptUrl;
-  loadFromSheet();
-} else {
-  loadLocal();
-  document.getElementById('config-banner-log').style.display = 'block';
-}
-updateSyncUI();
+      // ---- Init ----
+      document.getElementById("inp-date").value = new Date()
+        .toISOString()
+        .slice(0, 10);
+      if (scriptUrl) {
+        document.getElementById("script-url").value = scriptUrl;
+        loadFromSheet();
+      } else {
+        loadLocal();
+        document.getElementById("config-banner-log").style.display = "block";
+      }
+      updateSyncUI();
 
-// ---- Sync dot ----
-function updateSyncUI() {
-  const dot = document.getElementById('sync-dot');
-  const label = document.getElementById('sync-label');
-  const infoCon = document.getElementById('info-conn');
-  if (!scriptUrl) {
-    dot.className = 'dot'; label.textContent = 'ไม่ได้เชื่อมต่อ';
-    if (infoCon) infoCon.textContent = 'ไม่ได้เชื่อมต่อ';
-  } else if (isConnected) {
-    dot.className = 'dot connected'; label.textContent = 'เชื่อมต่อแล้ว';
-    if (infoCon) { infoCon.textContent = 'เชื่อมต่อแล้ว'; infoCon.style.color = 'var(--green)'; }
-  } else {
-    dot.className = 'dot error'; label.textContent = 'เชื่อมต่อไม่ได้';
-    if (infoCon) { infoCon.textContent = 'เชื่อมต่อไม่ได้'; infoCon.style.color = 'var(--red)'; }
-  }
-}
+      // ---- Sync dot ----
+      function updateSyncUI() {
+        const dot = document.getElementById("sync-dot");
+        const label = document.getElementById("sync-label");
+        const infoCon = document.getElementById("info-conn");
+        if (!scriptUrl) {
+          dot.className = "dot";
+          label.textContent = "ไม่ได้เชื่อมต่อ";
+          if (infoCon) infoCon.textContent = "ไม่ได้เชื่อมต่อ";
+        } else if (isConnected) {
+          dot.className = "dot connected";
+          label.textContent = "เชื่อมต่อแล้ว";
+          if (infoCon) {
+            infoCon.textContent = "เชื่อมต่อแล้ว";
+            infoCon.style.color = "var(--green)";
+          }
+        } else {
+          dot.className = "dot error";
+          label.textContent = "เชื่อมต่อไม่ได้";
+          if (infoCon) {
+            infoCon.textContent = "เชื่อมต่อไม่ได้";
+            infoCon.style.color = "var(--red)";
+          }
+        }
+      }
 
-// ---- Local storage fallback ----
-function loadLocal() {
-  try { entries = JSON.parse(localStorage.getItem('it_log_entries') || '[]'); } catch(e) { entries = []; }
-  updateInfoCount();
-}
-function saveLocal() {
-  localStorage.setItem('it_log_entries', JSON.stringify(entries));
-}
+      // ---- Local storage fallback ----
+      function loadLocal() {
+        try {
+          entries = JSON.parse(localStorage.getItem("it_log_entries") || "[]");
+        } catch (e) {
+          entries = [];
+        }
+        updateInfoCount();
+      }
+      function saveLocal() {
+        localStorage.setItem("it_log_entries", JSON.stringify(entries));
+      }
 
-// ---- Google Sheets API ----
-async function apiCall(params) {
-  if (!scriptUrl) return null;
-  const url = scriptUrl + '?' + new URLSearchParams(params).toString();
-  const res = await fetch(url);
-  return res.json();
-}
+      // ---- Google Sheets API ----
+      async function apiCall(params) {
+        if (!scriptUrl) return null;
+        const url = scriptUrl + "?" + new URLSearchParams(params).toString();
+        const res = await fetch(url);
+        return res.json();
+      }
 
-async function loadFromSheet() {
-  try {
-    const data = await apiCall({ action: 'getAll' });
-    if (data && data.entries) {
-      entries = data.entries;
-      isConnected = true;
-      saveLocal();
-    } else { throw new Error(); }
-  } catch(e) {
-    isConnected = false;
-    loadLocal();
-  }
-  updateSyncUI();
-  updateInfoCount();
-}
+      async function loadFromSheet() {
+        try {
+          const data = await apiCall({ action: "getAll" });
+          if (data && data.entries) {
+            entries = data.entries;
+            isConnected = true;
+            saveLocal();
+          } else {
+            throw new Error();
+          }
+        } catch (e) {
+          isConnected = false;
+          loadLocal();
+        }
+        updateSyncUI();
+        updateInfoCount();
+      }
 
-// ---- Tab switch ----
-function switchTab(name) {
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + name).classList.add('active');
-  event.target.classList.add('active');
-  if (name === 'history') renderHistory();
-  if (name === 'report') { setDefaultDates(); renderReport(); }
-  if (name === 'settings') updateInfoCount();
-}
+      // ---- Tab switch ----
+      function switchTab(name) {
+        document
+          .querySelectorAll(".view")
+          .forEach((v) => v.classList.remove("active"));
+        document
+          .querySelectorAll(".nav-btn")
+          .forEach((b) => b.classList.remove("active"));
+        document.getElementById("tab-" + name).classList.add("active");
+        event.target.classList.add("active");
+        if (name === "history") renderHistory();
+        if (name === "report") {
+          setDefaultDates();
+          renderReport();
+        }
+        if (name === "settings") updateInfoCount();
+      }
 
-// ---- Save entry ----
-async function saveEntry() {
-  const date = document.getElementById('inp-date').value;
-  if (!date) { toast('กรุณาเลือกวันที่', 'error'); return; }
-  const entry = {
-    id: Date.now(),
-    date,
-    requester: document.getElementById('inp-requester').value.trim(),
-    type: document.getElementById('inp-type').value,
-    channel: document.getElementById('inp-channel').value,
-    detail: document.getElementById('inp-detail').value.trim(),
-    time: parseInt(document.getElementById('inp-time').value) || 0,
-    status: document.getElementById('inp-status').value,
-  };
+      // ---- Save entry ----
+      async function saveEntry() {
+        const date = document.getElementById("inp-date").value;
+        if (!date) {
+          toast("กรุณาเลือกวันที่", "error");
+          return;
+        }
+        const entry = {
+          id: Date.now(),
+          date,
+          requester: document.getElementById("inp-requester").value.trim(),
+          type: document.getElementById("inp-type").value,
+          channel: document.getElementById("inp-channel").value,
+          detail: document.getElementById("inp-detail").value.trim(),
+          time: parseInt(document.getElementById("inp-time").value) || 0,
+          status: document.getElementById("inp-status").value,
+        };
 
-  const btn = document.getElementById('btn-save');
-  btn.disabled = true;
-  btn.textContent = 'กำลังบันทึก...';
+        const btn = document.getElementById("btn-save");
+        btn.disabled = true;
+        btn.textContent = "กำลังบันทึก...";
 
-  entries.unshift(entry);
-  saveLocal();
+        entries.unshift(entry);
+        saveLocal();
 
-  if (scriptUrl) {
-    try {
-      await apiCall({ action: 'add', data: JSON.stringify(entry) });
-      isConnected = true;
-      toast('บันทึกและ sync เรียบร้อย ✓', 'success');
-    } catch(e) {
-      isConnected = false;
-      toast('บันทึกเฉพาะเครื่อง (sync ไม่ได้)', 'error');
-    }
-    updateSyncUI();
-  } else {
-    toast('บันทึกเรียบร้อย (เฉพาะเครื่องนี้)');
-  }
+        if (scriptUrl) {
+          try {
+            await apiCall({ action: "add", data: JSON.stringify(entry) });
+            isConnected = true;
+            toast("บันทึกและ sync เรียบร้อย ✓", "success");
+          } catch (e) {
+            isConnected = false;
+            toast("บันทึกเฉพาะเครื่อง (sync ไม่ได้)", "error");
+          }
+          updateSyncUI();
+        } else {
+          toast("บันทึกเรียบร้อย (เฉพาะเครื่องนี้)");
+        }
 
-  btn.disabled = false;
-  btn.textContent = 'บันทึก case';
-  clearForm(true);
-  updateInfoCount();
-}
+        btn.disabled = false;
+        btn.textContent = "บันทึก case";
+        clearForm(true);
+        updateInfoCount();
+      }
 
-function clearForm(keepDate) {
-  if (!keepDate) document.getElementById('inp-date').value = new Date().toISOString().slice(0,10);
-  ['inp-requester','inp-detail','inp-time'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('inp-status').value = 'เสร็จแล้ว';
-  document.getElementById('inp-type').value = 'Hardware';
-  document.getElementById('inp-channel').value = 'Ticket';
-}
+      function clearForm(keepDate) {
+        if (!keepDate)
+          document.getElementById("inp-date").value = new Date()
+            .toISOString()
+            .slice(0, 10);
+        ["inp-requester", "inp-detail", "inp-time"].forEach(
+          (id) => (document.getElementById(id).value = ""),
+        );
+        document.getElementById("inp-status").value = "เสร็จแล้ว";
+        document.getElementById("inp-type").value = "Hardware";
+        document.getElementById("inp-channel").value = "Ticket";
+      }
 
-// ---- History ----
-function renderHistory() {
-  const loading = document.getElementById('history-loading');
-  const empty = document.getElementById('history-empty');
-  const body = document.getElementById('history-body');
-  loading.style.display = 'none';
+      // ---- History ----
+      function renderHistory() {
+        const loading = document.getElementById("history-loading");
+        const empty = document.getElementById("history-empty");
+        const body = document.getElementById("history-body");
+        loading.style.display = "none";
 
-  const ft = document.getElementById('f-type').value;
-  const fs = document.getElementById('f-status').value;
-  const filtered = entries.filter(e => (!ft || e.type === ft) && (!fs || e.status === fs));
+        const ft = document.getElementById("f-type").value;
+        const fs = document.getElementById("f-status").value;
+        const filtered = entries.filter(
+          (e) => (!ft || e.type === ft) && (!fs || e.status === fs),
+        );
 
-  if (filtered.length === 0) {
-    body.innerHTML = ''; empty.style.display = 'block'; return;
-  }
-  empty.style.display = 'none';
-  body.innerHTML = filtered.map(e => `
+        if (filtered.length === 0) {
+          body.innerHTML = "";
+          empty.style.display = "block";
+          return;
+        }
+        empty.style.display = "none";
+        body.innerHTML = filtered
+          .map(
+            (e) => `
     <tr>
       <td style="font-family:var(--mono);font-size:0.78rem;white-space:nowrap;">${e.date}</td>
-      <td style="max-width:130px;">${e.requester || '—'}</td>
+      <td style="max-width:130px;">${e.requester || "—"}</td>
       <td><span style="font-size:0.78rem;">${e.type}</span></td>
       <td style="font-size:0.78rem;">${e.channel}</td>
-      <td style="max-width:220px;color:var(--text3);font-size:0.8rem;">${e.detail || '—'}</td>
-      <td style="font-family:var(--mono);text-align:center;">${e.time || '—'}</td>
+      <td style="max-width:220px;color:var(--text3);font-size:0.8rem;">${e.detail || "—"}</td>
+      <td style="font-family:var(--mono);text-align:center;">${e.time || "—"}</td>
       <td>${statusTag(e.status)}</td>
       <td><button class="del-btn" onclick="deleteEntry(${e.id})">ลบ</button></td>
     </tr>
-  `).join('');
-}
+  `,
+          )
+          .join("");
+      }
 
-function statusTag(s) {
-  const map = {
-    'เสร็จแล้ว': 'tag-done',
-    'รอดำเนินการ': 'tag-pending',
-    'กำลังดำเนินการ': 'tag-open'
-  };
-  return `<span class="tag ${map[s] || 'tag-open'}">${s}</span>`;
-}
+      function statusTag(s) {
+        const map = {
+          เสร็จแล้ว: "tag-done",
+          รอดำเนินการ: "tag-pending",
+          กำลังดำเนินการ: "tag-open",
+        };
+        return `<span class="tag ${map[s] || "tag-open"}">${s}</span>`;
+      }
 
-async function deleteEntry(id) {
-  entries = entries.filter(e => e.id != id);
-  saveLocal();
-  renderHistory();
-  if (scriptUrl) {
-    try { await apiCall({ action: 'delete', id }); } catch(e) {}
-  }
-  updateInfoCount();
-}
+      async function deleteEntry(id) {
+        entries = entries.filter((e) => e.id != id);
+        saveLocal();
+        renderHistory();
+        if (scriptUrl) {
+          try {
+            await apiCall({ action: "delete", id });
+          } catch (e) {}
+        }
+        updateInfoCount();
+      }
 
-async function clearAll() {
-  if (!confirm('ลบข้อมูลทั้งหมดใช่ไหม?')) return;
-  entries = [];
-  saveLocal();
-  renderHistory();
-  if (scriptUrl) {
-    try { await apiCall({ action: 'deleteAll' }); } catch(e) {}
-  }
-  updateInfoCount();
-}
+      async function clearAll() {
+        if (!confirm("ลบข้อมูลทั้งหมดใช่ไหม?")) return;
+        entries = [];
+        saveLocal();
+        renderHistory();
+        if (scriptUrl) {
+          try {
+            await apiCall({ action: "deleteAll" });
+          } catch (e) {}
+        }
+        updateInfoCount();
+      }
 
-// ---- Report ----
-function setDefaultDates() {
-  const to = new Date();
-  const from = new Date(); from.setDate(to.getDate() - 29);
-  document.getElementById('rpt-from').value = from.toISOString().slice(0,10);
-  document.getElementById('rpt-to').value = to.toISOString().slice(0,10);
-}
+      // ---- Report ----
+      function setDefaultDates() {
+        const to = new Date();
+        const from = new Date();
+        from.setDate(to.getDate() - 29);
+        document.getElementById("rpt-from").value = from
+          .toISOString()
+          .slice(0, 10);
+        document.getElementById("rpt-to").value = to.toISOString().slice(0, 10);
+      }
 
-function renderReport() {
-  const from = document.getElementById('rpt-from').value;
-  const to = document.getElementById('rpt-to').value;
-  const f = entries.filter(e => (!from || e.date >= from) && (!to || e.date <= to));
+      function renderReport() {
+        const from = document.getElementById("rpt-from").value;
+        const to = document.getElementById("rpt-to").value;
+        const f = entries.filter(
+          (e) => (!from || e.date >= from) && (!to || e.date <= to),
+        );
 
-  document.getElementById('m-total').textContent = f.length;
-  document.getElementById('m-done').textContent = f.filter(e => e.status === 'เสร็จแล้ว').length;
-  const totalMin = f.reduce((s,e) => s + (Number(e.time)||0), 0);
-  document.getElementById('m-hrs').textContent = (totalMin/60).toFixed(1);
-  document.getElementById('m-avg').textContent = f.length ? Math.round(totalMin/f.length) : '—';
+        document.getElementById("m-total").textContent = f.length;
+        document.getElementById("m-done").textContent = f.filter(
+          (e) => e.status === "เสร็จแล้ว",
+        ).length;
+        const totalMin = f.reduce((s, e) => s + (Number(e.time) || 0), 0);
+        document.getElementById("m-hrs").textContent = (totalMin / 60).toFixed(
+          1,
+        );
+        document.getElementById("m-avg").textContent = f.length
+          ? Math.round(totalMin / f.length)
+          : "—";
 
-  const types = ["Hardware","Software","Network","Account/Access","Email","Printer","Other"];
-  const channels = ["Ticket","โทรศัพท์","แชท","Walk-in","On-site"];
-  renderBarChart('type-chart', types, t => f.filter(e => e.type===t).length);
-  renderBarChart('channel-chart', channels, c => f.filter(e => e.channel===c).length);
-  renderDailyChart(f);
-}
+        const types = [
+          "Hardware",
+          "Software",
+          "Network",
+          "Account/Access",
+          "Email",
+          "Printer",
+          "Other",
+        ];
+        const channels = ["Ticket", "โทรศัพท์", "แชท", "Walk-in", "On-site"];
+        renderBarChart(
+          "type-chart",
+          types,
+          (t) => f.filter((e) => e.type === t).length,
+        );
+        renderBarChart(
+          "channel-chart",
+          channels,
+          (c) => f.filter((e) => e.channel === c).length,
+        );
+        renderDailyChart(f);
+      }
 
-function renderBarChart(containerId, labels, countFn) {
-  const container = document.getElementById(containerId);
-  const counts = labels.map(countFn);
-  const max = Math.max(...counts, 1);
-  container.innerHTML = labels.map((l,i) => `
+      function renderBarChart(containerId, labels, countFn) {
+        const container = document.getElementById(containerId);
+        const counts = labels.map(countFn);
+        const max = Math.max(...counts, 1);
+        container.innerHTML = labels
+          .map(
+            (l, i) => `
     <div class="type-row">
       <span class="type-name">${l}</span>
-      <div class="type-bar-bg"><div class="type-bar" style="width:${(counts[i]/max*100).toFixed(0)}%"></div></div>
+      <div class="type-bar-bg"><div class="type-bar" style="width:${((counts[i] / max) * 100).toFixed(0)}%"></div></div>
       <span class="type-count">${counts[i]}</span>
     </div>
-  `).join('');
-}
-
-function renderDailyChart(filtered) {
-  const days = Array.from({length:7}, (_,i) => {
-    const d = new Date(); d.setDate(d.getDate() - (6-i));
-    return d.toISOString().slice(0,10);
-  });
-  const counts = days.map(d => filtered.filter(e => e.date === d).length);
-  const max = Math.max(...counts, 1);
-  const chartEl = document.getElementById('daily-chart');
-  const labelEl = document.getElementById('daily-labels');
-  chartEl.innerHTML = counts.map((c,i) => `
-    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;">
-      <span style="font-size:0.7rem;font-family:var(--mono);color:var(--text3);">${c||''}</span>
-      <div style="width:100%;background:var(--accent);border-radius:4px 4px 0 0;height:${Math.max(c/max*100,c?4:0)}px;transition:height 0.4s ease;opacity:${c?1:0.15};"></div>
-    </div>
-  `).join('');
-  labelEl.innerHTML = days.map(d => `
-    <div style="flex:1;text-align:center;font-size:0.68rem;font-family:var(--mono);color:var(--text3);">${d.slice(5)}</div>
-  `).join('');
-}
-
-// ---- Settings ----
-function saveUrl() {
-  const url = document.getElementById('script-url').value.trim();
-  scriptUrl = url;
-  localStorage.setItem('it_script_url', url);
-  const statusEl = document.getElementById('url-status');
-  document.getElementById('config-banner-log').style.display = url ? 'none' : 'block';
-  if (url) {
-    statusEl.textContent = 'กำลังทดสอบการเชื่อมต่อ...';
-    statusEl.style.color = 'var(--text3)';
-    loadFromSheet().then(() => {
-      if (isConnected) {
-        statusEl.textContent = '✓ เชื่อมต่อสำเร็จ — โหลดข้อมูลจาก Google Sheets แล้ว';
-        statusEl.style.color = 'var(--green)';
-        toast('เชื่อมต่อ Google Sheets สำเร็จ!', 'success');
-      } else {
-        statusEl.textContent = '✗ URL ไม่ถูกต้องหรือ deploy ยังไม่เสร็จ';
-        statusEl.style.color = 'var(--red)';
-        toast('เชื่อมต่อไม่ได้ ลองตรวจสอบ URL อีกครั้ง', 'error');
+  `,
+          )
+          .join("");
       }
-    });
-  } else {
-    statusEl.textContent = '';
-    isConnected = false;
-    updateSyncUI();
-  }
-}
 
-function updateInfoCount() {
-  const el = document.getElementById('info-count');
-  if (el) el.textContent = entries.length + ' cases';
-}
+      function renderDailyChart(filtered) {
+        const days = Array.from({ length: 7 }, (_, i) => {
+          const d = new Date();
+          d.setDate(d.getDate() - (6 - i));
+          return d.toISOString().slice(0, 10);
+        });
+        const counts = days.map(
+          (d) => filtered.filter((e) => e.date === d).length,
+        );
+        const max = Math.max(...counts, 1);
+        const chartEl = document.getElementById("daily-chart");
+        const labelEl = document.getElementById("daily-labels");
+        chartEl.innerHTML = counts
+          .map(
+            (c, i) => `
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;">
+      <span style="font-size:0.7rem;font-family:var(--mono);color:var(--text3);">${c || ""}</span>
+      <div style="width:100%;background:var(--accent);border-radius:4px 4px 0 0;height:${Math.max((c / max) * 100, c ? 4 : 0)}px;transition:height 0.4s ease;opacity:${c ? 1 : 0.15};"></div>
+    </div>
+  `,
+          )
+          .join("");
+        labelEl.innerHTML = days
+          .map(
+            (d) => `
+    <div style="flex:1;text-align:center;font-size:0.68rem;font-family:var(--mono);color:var(--text3);">${d.slice(5)}</div>
+  `,
+          )
+          .join("");
+      }
 
-// ---- Toast ----
-function toast(msg, type='') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast' + (type ? ' '+type : '');
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2800);
-}
-</script>
-</body>
+      // ---- Settings ----
+      function saveUrl() {
+        const url = document.getElementById("script-url").value.trim();
+        scriptUrl = url;
+        localStorage.setItem("it_script_url", url);
+        const statusEl = document.getElementById("url-status");
+        document.getElementById("config-banner-log").style.display = url
+          ? "none"
+          : "block";
+        if (url) {
+          statusEl.textContent = "กำลังทดสอบการเชื่อมต่อ...";
+          statusEl.style.color = "var(--text3)";
+          loadFromSheet().then(() => {
+            if (isConnected) {
+              statusEl.textContent =
+                "✓ เชื่อมต่อสำเร็จ — โหลดข้อมูลจาก Google Sheets แล้ว";
+              statusEl.style.color = "var(--green)";
+              toast("เชื่อมต่อ Google Sheets สำเร็จ!", "success");
+            } else {
+              statusEl.textContent = "✗ URL ไม่ถูกต้องหรือ deploy ยังไม่เสร็จ";
+              statusEl.style.color = "var(--red)";
+              toast("เชื่อมต่อไม่ได้ ลองตรวจสอบ URL อีกครั้ง", "error");
+            }
+          });
+        } else {
+          statusEl.textContent = "";
+          isConnected = false;
+          updateSyncUI();
+        }
+      }
+
+      function updateInfoCount() {
+        const el = document.getElementById("info-count");
+        if (el) el.textContent = entries.length + " cases";
+      }
+
+      // ---- Toast ----
+      function toast(msg, type = "") {
+        const t = document.getElementById("toast");
+        t.textContent = msg;
+        t.className = "toast" + (type ? " " + type : "");
+        t.classList.add("show");
+        setTimeout(() => t.classList.remove("show"), 2800);
+      }
+    </script>
+  </body>
 </html>
